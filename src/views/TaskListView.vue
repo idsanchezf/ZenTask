@@ -96,7 +96,6 @@
             <button class="delete-link" @click="deleteTask(selectedTask)">Eliminar Tarea</button>
             <button class="save-btn" @click="saveTask">Guardar</button>
           </div>
-          </div>
         </div>
       </div>
     </Transition>
