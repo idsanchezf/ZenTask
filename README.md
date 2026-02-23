@@ -27,7 +27,8 @@ Toda nueva funcionalidad debe seguir este flujo:
 ### 4. Comandos del Proyecto
 - **Ejecutar App**: `npm run dev`
 - **Correr Pruebas**: `npm run test:bdd`
-- **Generar Reporte**: `npm run report:generate` (Ver resultados en `cypress/reports/html/index.html`).
+- **Generar Reporte**: `npm run report:generate`
+- **Abrir Reporte**: `npm run report:open` (Inicia un servidor para ver el HTML en el navegador).
 
 ---
 

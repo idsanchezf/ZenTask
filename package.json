@@ -8,7 +8,8 @@
         "build": "vite build",
         "preview": "vite preview",
         "test:bdd": "cypress run",
-        "report:generate": "node ./generate-report.js"
+        "report:generate": "node ./generate-report.js",
+        "report:open": "npx serve cypress/reports/html"
     },
     "dependencies": {
         "vue": "^3.4.21",
