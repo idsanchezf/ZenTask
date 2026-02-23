@@ -90,7 +90,7 @@
           </div>
           
           <div class="detail-footer">
-            <button class="save-btn" @click="selectedTask = null">Guardar</button>
+            <button class="save-btn" @click="saveTask">Guardar</button>
           </div>
         </div>
       </div>
@@ -137,6 +137,24 @@ const moveTask = (task, from, to) => {
 // Lógica de detalle (HU4)
 const openDetail = (task) => {
   selectedTask.value = { ...task }
+}
+
+const saveTask = () => {
+  if (!selectedTask.value) return
+  
+  const updateList = (list) => {
+    const index = list.value.findIndex(t => t.id === selectedTask.value.id)
+    if (index !== -1) {
+      list.value[index] = { ...selectedTask.value }
+      return true
+    }
+    return false
+  }
+
+  const updated = updateList(pendingTasks) || updateList(inProgressTasks) || updateList(doneTasks)
+  if (updated) {
+    selectedTask.value = null
+  }
 }
 </script>
 
