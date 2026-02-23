@@ -175,3 +175,25 @@ When("limpia el campo de búsqueda", () => {
 Then("deberían volver a verse todas las tareas", () => {
     cy.get('.task-card').should('have.length.at.least', 2);
 });
+
+// Steps de Borrado (HU7)
+When("hace clic en el icono de borrar de la tarea", () => {
+    cy.get('.delete-btn').first().click();
+});
+
+When("confirma la eliminación", () => {
+    // Cypress maneja los confirm enviando true por defecto, pero podemos forzarlo
+    cy.on('window:confirm', () => true);
+});
+
+When("hace clic en el enlace {string}", (linkText) => {
+    cy.get('.delete-link').contains(linkText).click();
+});
+
+Then("la tarea debería desaparecer de su columna", () => {
+    cy.get('.task-detail-sidebar').should('not.exist');
+});
+
+Then("la tarea {string} debería desaparecer del tablero", (title) => {
+    cy.get('.task-card').contains(title).should('not.exist');
+});
