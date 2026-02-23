@@ -22,6 +22,7 @@
             <div class="meta">
               <span :class="['badge', task.priority.toLowerCase()]">{{ task.priority }}</span>
               <div class="actions">
+                <button class="delete-btn" @click.stop="deleteTask(task)">🗑️</button>
                 <button class="move-right" @click.stop="moveTask(task, 'pending', 'inProgress')">→</button>
               </div>
             </div>
@@ -38,6 +39,7 @@
             <div class="meta">
               <span :class="['badge', task.priority.toLowerCase()]">{{ task.priority }}</span>
               <div class="actions">
+                <button class="delete-btn" @click.stop="deleteTask(task)">🗑️</button>
                 <button class="move-left" @click.stop="moveTask(task, 'inProgress', 'pending')">←</button>
                 <button class="move-right" @click.stop="moveTask(task, 'inProgress', 'done')">→</button>
               </div>
@@ -55,6 +57,7 @@
             <div class="meta">
               <span :class="['badge', task.priority.toLowerCase()]">{{ task.priority }}</span>
               <div class="actions">
+                <button class="delete-btn" @click.stop="deleteTask(task)">🗑️</button>
                 <button class="move-left" @click.stop="moveTask(task, 'done', 'inProgress')">←</button>
               </div>
             </div>
@@ -90,7 +93,9 @@
           </div>
           
           <div class="detail-footer">
+            <button class="delete-link" @click="deleteTask(selectedTask)">Eliminar Tarea</button>
             <button class="save-btn" @click="saveTask">Guardar</button>
+          </div>
           </div>
         </div>
       </div>
@@ -153,6 +158,15 @@ const saveTask = () => {
 
   const updated = updateList(pendingTasks) || updateList(inProgressTasks) || updateList(doneTasks)
   if (updated) {
+    selectedTask.value = null
+  }
+}
+
+const deleteTask = (task) => {
+  if (confirm(`¿Estás seguro de que deseas eliminar la tarea "${task.title}"?`)) {
+    pendingTasks.value = pendingTasks.value.filter(t => t.id !== task.id)
+    inProgressTasks.value = inProgressTasks.value.filter(t => t.id !== task.id)
+    doneTasks.value = doneTasks.value.filter(t => t.id !== task.id)
     selectedTask.value = null
   }
 }
@@ -324,6 +338,30 @@ header p {
   border: none;
   border-radius: 8px;
   font-weight: 600;
+}
+
+.delete-btn {
+  font-size: 0.9rem !important;
+  opacity: 0.5;
+  margin-right: 0.5rem;
+}
+
+.delete-btn:hover {
+  opacity: 1;
+  color: #ff3e3e !important;
+}
+
+.delete-link {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 1rem;
+  background: transparent;
+  border: none;
+  color: #ff3e3e;
+  font-size: 0.8rem;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 /* Transición */
