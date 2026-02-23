@@ -37,6 +37,7 @@ Then("debería ver un mensaje de bienvenida que diga {string}", (welcomeText) =>
 
 // Steps de Tablero (HU2)
 Given("que el usuario navega a la vista de {string}", (viewName) => {
+    cy.visit("/");
     cy.get('.sidebar').contains(viewName).click();
 });
 
