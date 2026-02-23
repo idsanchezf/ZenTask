@@ -89,3 +89,78 @@ Then("la tarea debería ser añadida a la lista de tareas", () => {
 Then("una nueva tarea {string} debería ser procesada", (taskName) => {
     cy.get('.quick-entry input').should('have.value', '');
 });
+
+// Steps de Detalle y Edición (HU4)
+When("hace clic en una tarea {string}", (taskTitle) => {
+    cy.get('.task-card').contains(taskTitle).click();
+});
+
+Then("debería abrirse un panel lateral con el título {string}", (title) => {
+    cy.get('.task-detail-sidebar').should('be.visible');
+    cy.get('.task-detail-sidebar h2').contains(title);
+});
+
+Given("que el usuario tiene abierto el detalle de una tarea", () => {
+    cy.visit("/tareas");
+    cy.get('.task-card').first().click();
+});
+
+When("cambia el título a {string}", (newTitle) => {
+    cy.get('.task-detail-sidebar input[name="title"]').clear().type(newTitle);
+});
+
+When("guarda los cambios", () => {
+    cy.get('.save-btn').click();
+});
+
+Then("la tarea en el tablero debería mostrar el nuevo título {string}", (expectedTitle) => {
+    cy.get('.task-card').contains(expectedTitle).should('exist');
+});
+
+// Steps de Gestión de Estados (HU5)
+Given("existe una tarea en la columna {string}", (column) => {
+    cy.get('.kanban-column').contains(column).parent().find('.task-card').should('have.length.at.least', 1);
+});
+
+When("hace clic en el botón de mover a la derecha en la tarea", () => {
+    cy.get('.task-card').first().find('.move-right').click();
+});
+
+Then("la tarea debería desaparecer de {string}", (column) => {
+    cy.get('.kanban-column').contains(column).parent().find('.task-card').should('not.exist');
+});
+
+Then("la tarea debería aparecer en la columna {string}", (column) => {
+    cy.get('.kanban-column').contains(column).parent().find('.task-card').should('be.visible');
+});
+
+// Steps de Buscador (HU6)
+Given("existen tareas tituladas {string} y {string}", (title1, title2) => {
+    cy.get('.kanban').contains(title1).should('be.visible');
+    cy.get('.kanban').contains(title2).should('be.visible');
+});
+
+When("escribe {string} en el buscador del tablero", (searchText) => {
+    cy.get('.search-bar input').type(searchText);
+});
+
+Then("debería verse la tarea {string}", (title) => {
+    cy.get('.task-card').contains(title).should('exist');
+});
+
+Then("no debería verse la tarea {string}", (title) => {
+    cy.get('.task-card').contains(title).should('not.exist');
+});
+
+Given("que el usuario ha filtrado tareas por {string}", (text) => {
+    cy.visit("/tareas");
+    cy.get('.search-bar input').type(text);
+});
+
+When("limpia el campo de búsqueda", () => {
+    cy.get('.search-bar input').clear();
+});
+
+Then("deberían volver a verse todas las tareas", () => {
+    cy.get('.task-card').should('have.length.at.least', 2);
+});

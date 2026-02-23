@@ -5,15 +5,25 @@
       <p>Organiza y gestiona tu trabajo pendiente.</p>
     </header>
 
+    <!-- Buscador (HU6) -->
+    <div class="search-section">
+      <div class="search-bar glass">
+        <input v-model="searchQuery" type="text" placeholder="Buscar tareas..." />
+      </div>
+    </div>
+
     <div class="kanban">
       <!-- Columna Pendiente -->
       <div class="kanban-column glass">
         <h3>Pendiente</h3>
         <div class="card-list">
-          <div v-for="task in pendingTasks" :key="task.id" class="task-card glass">
+          <div v-for="task in filteredPending" :key="task.id" class="task-card glass" @click="openDetail(task)">
             <h4>{{ task.title }}</h4>
             <div class="meta">
               <span :class="['badge', task.priority.toLowerCase()]">{{ task.priority }}</span>
+              <div class="actions">
+                <button class="move-right" @click.stop="moveTask(task, 'pending', 'inProgress')">→</button>
+              </div>
             </div>
           </div>
         </div>
@@ -23,10 +33,14 @@
       <div class="kanban-column glass">
         <h3>En Progreso</h3>
         <div class="card-list">
-          <div v-for="task in inProgressTasks" :key="task.id" class="task-card glass">
+          <div v-for="task in filteredInProgress" :key="task.id" class="task-card glass" @click="openDetail(task)">
             <h4>{{ task.title }}</h4>
             <div class="meta">
               <span :class="['badge', task.priority.toLowerCase()]">{{ task.priority }}</span>
+              <div class="actions">
+                <button class="move-left" @click.stop="moveTask(task, 'inProgress', 'pending')">←</button>
+                <button class="move-right" @click.stop="moveTask(task, 'inProgress', 'done')">→</button>
+              </div>
             </div>
           </div>
         </div>
@@ -36,36 +50,101 @@
       <div class="kanban-column glass">
         <h3>Finalizado</h3>
         <div class="card-list">
-          <div v-for="task in doneTasks" :key="task.id" class="task-card glass">
+          <div v-for="task in filteredDone" :key="task.id" class="task-card glass" @click="openDetail(task)">
             <h4>{{ task.title }}</h4>
             <div class="meta">
               <span :class="['badge', task.priority.toLowerCase()]">{{ task.priority }}</span>
+              <div class="actions">
+                <button class="move-left" @click.stop="moveTask(task, 'done', 'inProgress')">←</button>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Panel de Detalle Lateral (HU4) -->
+    <Transition name="slide">
+      <div v-if="selectedTask" class="task-detail-sidebar glass">
+        <div class="detail-header">
+          <h2>Detalle de Tarea</h2>
+          <button @click="selectedTask = null" class="close-btn">×</button>
+        </div>
+        
+        <div class="detail-content">
+          <div class="form-group">
+            <label>Título</label>
+            <input v-model="selectedTask.title" type="text" name="title" />
+          </div>
+          <div class="form-group">
+            <label>Prioridad</label>
+            <select v-model="selectedTask.priority">
+              <option>Alta</option>
+              <option>Media</option>
+              <option>Baja</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Descripción</label>
+            <textarea v-model="selectedTask.description" rows="5"></textarea>
+          </div>
+          
+          <div class="detail-footer">
+            <button class="save-btn" @click="selectedTask = null">Guardar</button>
+          </div>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+
+const searchQuery = ref('')
+const selectedTask = ref(null)
 
 const pendingTasks = ref([
-  { id: 1, title: 'Diseñar arquitectura base', priority: 'Alta' },
-  { id: 2, title: 'Configurar entorno BDD', priority: 'Media' }
+  { id: 1, title: 'Diseñar arquitectura base', priority: 'Alta', description: 'Definir la estructura de carpetas y el patrón de diseño.' },
+  { id: 2, title: 'Configurar entorno BDD', priority: 'Media', description: 'Instalar Cypress y Cucumber preprocessor.' }
 ])
 
 const inProgressTasks = ref([
-  { id: 3, title: 'Implementar HU2 Kanban', priority: 'Alta' }
+  { id: 3, title: 'Implementar HU2 Kanban', priority: 'Alta', description: 'Crear la vista de tablero con sus columnas.' }
 ])
 
 const doneTasks = ref([
-  { id: 4, title: 'Definir historias de usuario', priority: 'Baja' }
+  { id: 4, title: 'Definir historias de usuario', priority: 'Baja', description: 'Documentar las HUs iniciales en el plan.' }
 ])
+
+// Lógica de filtrado (HU6)
+const filterTasks = (tasks) => {
+  if (!searchQuery.value) return tasks
+  return tasks.filter(t => t.title.toLowerCase().includes(searchQuery.value.toLowerCase()))
+}
+
+const filteredPending = computed(() => filterTasks(pendingTasks.value))
+const filteredInProgress = computed(() => filterTasks(inProgressTasks.value))
+const filteredDone = computed(() => filterTasks(doneTasks.value))
+
+// Lógica de movimiento (HU5)
+const moveTask = (task, from, to) => {
+  const lists = { pending: pendingTasks, inProgress: inProgressTasks, done: doneTasks }
+  lists[from].value = lists[from].value.filter(t => t.id !== task.id)
+  lists[to].value.push(task)
+}
+
+// Lógica de detalle (HU4)
+const openDetail = (task) => {
+  selectedTask.value = { ...task }
+}
 </script>
 
 <style scoped>
+.task-list-view {
+  position: relative;
+}
+
 h1 {
   font-size: 2.2rem;
   margin-bottom: 0.5rem;
@@ -73,7 +152,24 @@ h1 {
 
 header p {
   color: var(--text-secondary);
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
+}
+
+.search-section {
+  margin-bottom: 2rem;
+}
+
+.search-bar {
+  max-width: 400px;
+  padding: 0.5rem 1rem;
+}
+
+.search-bar input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 0.5rem 0;
 }
 
 .kanban {
@@ -105,7 +201,13 @@ header p {
   padding: 1.2rem;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
-  cursor: grab;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.task-card:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .task-card h4 {
@@ -127,7 +229,90 @@ header p {
   border: 1px solid var(--card-border);
 }
 
+.actions button {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  padding: 0 0.2rem;
+}
+
+.actions button:hover {
+  color: var(--accent-blue);
+}
+
 .alta { color: #ff3e3e; border-color: #ff3e3e; }
 .media { color: #f39c12; border-color: #f39c12; }
 .baja { color: #2ecc71; border-color: #2ecc71; }
+
+/* Panel de Detalle */
+.task-detail-sidebar {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 400px;
+  height: 100vh;
+  z-index: 100;
+  padding: 2.5rem;
+  border-radius: 0;
+  border-left: 1px solid var(--card-border);
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.form-group input, 
+.form-group select, 
+.form-group textarea {
+  width: 100%;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  color: white;
+  padding: 0.8rem;
+}
+
+.detail-footer {
+  margin-top: 3rem;
+}
+
+.save-btn {
+  width: 100%;
+  padding: 1rem;
+  background: var(--accent-blue);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+/* Transición */
+.slide-enter-active, .slide-leave-active {
+  transition: transform 0.3s ease;
+}
+.slide-enter-from, .slide-leave-to {
+  transform: translateX(100%);
+}
 </style>
