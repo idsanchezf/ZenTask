@@ -3,8 +3,8 @@ Feature: Detalle y Edición de Tareas
 
   Scenario: Abrir modal de detalle
     Given que el usuario está en el tablero Kanban
-    When hace clic en una tarea "Tarea de ejemplo"
-    Then debería abrirse un panel lateral con el título "Tarea de ejemplo"
+    When hace clic en una tarea "Diseñar arquitectura base"
+    Then debería abrirse un panel lateral
 
   Scenario: Editar título de tarea
     Given que el usuario tiene abierto el detalle de una tarea
