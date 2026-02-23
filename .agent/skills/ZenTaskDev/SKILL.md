@@ -8,7 +8,7 @@ description: Metodología estandarizada para la construcción de Historias de Us
 Esta skill define el proceso obligatorio para expandir la aplicación ZenTask, asegurando coherencia visual y calidad técnica mediante BDD.
 
 ## 1. Fase de Definición (HU y Criterios)
-Al iniciar una nueva HU, se debe documentar en el `implementation_plan.md`:
+Al iniciar o modificar una HU, se debe actualizar obligatoriamente en `docs/implementation_plan.md`:
 - **Formato HU**: "Como [rol], quiero [acción], para [valor]".
 - **Criterios de Aceptación**: Lista numerada de condiciones verificables.
 
@@ -25,7 +25,7 @@ Antes de escribir código Vue, se debe crear la prueba funcional:
 - **Formato Gherkin Híbrido**:
   - Keywords (EN): `Feature`, `Scenario`, `Given`, `When`, `Then`, `And`.
   - Contenido (ES): Descripción de la acción y el resultado.
-- **Implementación**: Crear los pasos en `cypress/e2e/step_definitions/[nombre].js`.
+- **Implementación**: Crear los pasos en `cypress/e2e/step_definitions/steps.js` (o archivo específico).
 
 ## 4. Fase de Implementación (Vue 3)
 - **Componentes**: Deben ser atómicos y reutilizables.
@@ -37,6 +37,7 @@ Es mandatorio ejecutar el ciclo completo de pruebas localmente (o en Codespace) 
 2. `npm run report:generate` (Procesamiento).
 3. `npm run report:open` (Validación visual del reporte).
 
-## 6. Sincronización
-- Los commits deben ser descriptivos: `Feat: ...`, `Fix: ...`, `Refactor: ...`.
-- Asegurar que el `README.md` se mantenga actualizado si cambian las reglas base.
+## 6. Documentación y Sincronización
+- **Carpeta `docs/`**: Es obligatorio mantener actualizados los archivos `docs/implementation_plan.md`, `docs/task.md` y `docs/walkthrough.md` ante cualquier cambio funcional o nueva HU.
+- **Commits**: Deben ser descriptivos: `Feat: ...`, `Fix: ...`, `Refactor: ...`.
+- **README**: Asegurar que el `README.md` refleje cualquier cambio en la arquitectura o dependencias.
