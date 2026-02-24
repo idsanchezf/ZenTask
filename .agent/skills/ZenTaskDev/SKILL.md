@@ -22,6 +22,23 @@ Al iniciar o modificar una HU, se debe actualizar obligatoriamente en `docs/impl
 ## 3. Fase de Calidad (BDD de Cypress)
 Antes de escribir código Vue, se debe crear la prueba funcional:
 - **Ubicación del Feature**: `cypress/e2e/features/[nombre-hu].feature`.
+- **Estándar de nomenclatura** (regla obligatoria):
+  - Formato: **`huN_nombre_descriptivo.feature`** (snake_case, prefijo `huN` con el número de HU).
+  - Siempre en minúsculas, palabras separadas por guión bajo `_`, sin guiones medios `-`.
+  - El nombre descriptivo resume la funcionalidad en 1-3 palabras.
+  - Tabla de referencia del proyecto:
+
+    | HU | Archivo |
+    |----|---------|
+    | HU1 | `hu1_navegacion.feature` |
+    | HU2 | `hu2_tablero_kanban.feature` |
+    | HU3 | `hu3_entrada_rapida.feature` |
+    | HU4 | `hu4_detalle_edicion.feature` |
+    | HU5 | `hu5_gestion_estados.feature` |
+    | HU6 | `hu6_buscador_filtros.feature` |
+    | HU7 | `hu7_borrado_tareas.feature` |
+    | HU8 | `hu8_etiquetas.feature` |
+
 - **Formato Gherkin Híbrido**:
   - Keywords (EN): `Feature`, `Scenario`, `Given`, `When`, `Then`, `And`.
   - Contenido (ES): Descripción de la acción y el resultado.
