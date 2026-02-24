@@ -40,6 +40,14 @@ Este documento detalla el plan para implementar los primeros módulos de la apli
 - **Criterio 1**: Icono de papelera en cada tarjeta para borrado rápido.
 - **Criterio 2**: Botón de "Eliminar" dentro del modal de detalle con confirmación visual.
 
+### HU8: Asignación y Filtrado de Etiquetas (Tags)
+**Como** usuario, **quiero** asignar etiquetas a mis tareas y filtrar el tablero por ellas, **para** categorizar mi trabajo y encontrar tareas relacionadas rápidamente.
+- **Criterio 1**: Cada tarea puede tener etiquetas de la lista: `Diseño`, `Dev`, `QA`, `Docs`.
+- **Criterio 2**: Las etiquetas se muestran como chips de color en las tarjetas del tablero.
+- **Criterio 3**: El panel de detalle permite activar/desactivar etiquetas con chips toggle.
+- **Criterio 4**: Filtros de etiqueta encima del tablero; al activar uno, solo se muestran tareas con esa etiqueta.
+- **Criterio 5**: El filtro de etiqueta y el buscador de texto funcionan simultáneamente.
+
 ---
 
 ## Configuración de Entorno (Codespaces)

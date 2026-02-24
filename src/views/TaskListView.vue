@@ -5,10 +5,21 @@
       <p>Organiza y gestiona tu trabajo pendiente.</p>
     </header>
 
-    <!-- Buscador (HU6) -->
-    <div class="search-section">
+    <!-- Barra de controles: búsqueda + filtros de etiqueta (HU6 + HU8) -->
+    <div class="controls-section">
       <div class="search-bar glass">
         <input v-model="searchQuery" type="text" placeholder="Buscar tareas..." />
+      </div>
+
+      <div class="tag-filters">
+        <span class="filter-label">Filtrar:</span>
+        <TagChip
+          v-for="tag in AVAILABLE_TAGS"
+          :key="tag"
+          :label="tag"
+          :active="activeTagFilter === tag"
+          @click="toggleTagFilter(tag)"
+        />
       </div>
     </div>
 
@@ -19,6 +30,9 @@
         <div class="card-list">
           <div v-for="task in filteredPending" :key="task.id" class="task-card glass" @click="openDetail(task)">
             <h4>{{ task.title }}</h4>
+            <div class="tags-row" v-if="task.tags.length">
+              <TagChip v-for="tag in task.tags" :key="tag" :label="tag" :active="true" />
+            </div>
             <div class="meta">
               <span :class="['badge', task.priority.toLowerCase()]">{{ task.priority }}</span>
               <div class="actions">
@@ -36,6 +50,9 @@
         <div class="card-list">
           <div v-for="task in filteredInProgress" :key="task.id" class="task-card glass" @click="openDetail(task)">
             <h4>{{ task.title }}</h4>
+            <div class="tags-row" v-if="task.tags.length">
+              <TagChip v-for="tag in task.tags" :key="tag" :label="tag" :active="true" />
+            </div>
             <div class="meta">
               <span :class="['badge', task.priority.toLowerCase()]">{{ task.priority }}</span>
               <div class="actions">
@@ -54,6 +71,9 @@
         <div class="card-list">
           <div v-for="task in filteredDone" :key="task.id" class="task-card glass" @click="openDetail(task)">
             <h4>{{ task.title }}</h4>
+            <div class="tags-row" v-if="task.tags.length">
+              <TagChip v-for="tag in task.tags" :key="tag" :label="tag" :active="true" />
+            </div>
             <div class="meta">
               <span :class="['badge', task.priority.toLowerCase()]">{{ task.priority }}</span>
               <div class="actions">
@@ -66,14 +86,14 @@
       </div>
     </div>
 
-    <!-- Panel de Detalle Lateral (HU4) -->
+    <!-- Panel de Detalle Lateral (HU4 + HU8) -->
     <Transition name="slide">
       <div v-if="selectedTask" class="task-detail-sidebar glass">
         <div class="detail-header">
           <h2>Detalle de Tarea</h2>
           <button @click="selectedTask = null" class="close-btn">×</button>
         </div>
-        
+
         <div class="detail-content">
           <div class="form-group">
             <label>Título</label>
@@ -89,9 +109,23 @@
           </div>
           <div class="form-group">
             <label>Descripción</label>
-            <textarea v-model="selectedTask.description" rows="5"></textarea>
+            <textarea v-model="selectedTask.description" rows="4"></textarea>
           </div>
-          
+
+          <!-- Sección Etiquetas (HU8) -->
+          <div class="form-group">
+            <label>Etiquetas</label>
+            <div class="tag-selector">
+              <TagChip
+                v-for="tag in AVAILABLE_TAGS"
+                :key="tag"
+                :label="tag"
+                :active="selectedTask.tags.includes(tag)"
+                @click="toggleTag(tag)"
+              />
+            </div>
+          </div>
+
           <div class="detail-footer">
             <button class="delete-link" @click="deleteTask(selectedTask)">Eliminar Tarea</button>
             <button class="save-btn" @click="saveTask">Guardar</button>
@@ -104,68 +138,86 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import TagChip from '../components/TagChip.vue'
 
+// --- Constantes ---
+const AVAILABLE_TAGS = ['Diseño', 'Dev', 'QA', 'Docs']
+
+// --- Estado reactivo ---
 const searchQuery = ref('')
 const selectedTask = ref(null)
+const activeTagFilter = ref(null)
 
 const pendingTasks = ref([
-  { id: 1, title: 'Diseñar arquitectura base', priority: 'Alta', description: 'Definir la estructura de carpetas y el patrón de diseño.' },
-  { id: 2, title: 'Configurar entorno BDD', priority: 'Media', description: 'Instalar Cypress y Cucumber preprocessor.' }
+  { id: 1, title: 'Diseñar arquitectura base',   priority: 'Alta',  tags: ['Diseño', 'Dev'],  description: 'Definir la estructura de carpetas y el patrón de diseño.' },
+  { id: 2, title: 'Configurar entorno BDD',       priority: 'Media', tags: ['Dev', 'QA'],      description: 'Instalar Cypress y Cucumber preprocessor.' },
 ])
 
 const inProgressTasks = ref([
-  { id: 3, title: 'Implementar HU2 Kanban', priority: 'Alta', description: 'Crear la vista de tablero con sus columnas.' }
+  { id: 3, title: 'Implementar HU2 Kanban',       priority: 'Alta',  tags: ['Dev'],            description: 'Crear la vista de tablero con sus columnas.' },
 ])
 
 const doneTasks = ref([
-  { id: 4, title: 'Definir historias de usuario', priority: 'Baja', description: 'Documentar las HUs iniciales en el plan.' }
+  { id: 4, title: 'Definir historias de usuario', priority: 'Baja',  tags: ['Docs'],           description: 'Documentar las HUs iniciales en el plan.' },
 ])
 
-// Lógica de filtrado (HU6)
+// --- Lógica de filtrado (HU6 + HU8) ---
 const filterTasks = (tasks) => {
-  if (!searchQuery.value) return tasks
-  return tasks.filter(t => t.title.toLowerCase().includes(searchQuery.value.toLowerCase()))
+  return tasks.filter(t => {
+    const matchesText = !searchQuery.value
+      || t.title.toLowerCase().includes(searchQuery.value.toLowerCase())
+    const matchesTag = !activeTagFilter.value
+      || t.tags.includes(activeTagFilter.value)
+    return matchesText && matchesTag
+  })
 }
 
-const filteredPending = computed(() => filterTasks(pendingTasks.value))
+const filteredPending    = computed(() => filterTasks(pendingTasks.value))
 const filteredInProgress = computed(() => filterTasks(inProgressTasks.value))
-const filteredDone = computed(() => filterTasks(doneTasks.value))
+const filteredDone       = computed(() => filterTasks(doneTasks.value))
 
-// Lógica de movimiento (HU5)
+// --- Lógica de filtro de etiqueta (HU8) ---
+const toggleTagFilter = (tag) => {
+  activeTagFilter.value = activeTagFilter.value === tag ? null : tag
+}
+
+// --- Lógica de movimiento (HU5) ---
 const moveTask = (task, from, to) => {
   const lists = { pending: pendingTasks, inProgress: inProgressTasks, done: doneTasks }
   lists[from].value = lists[from].value.filter(t => t.id !== task.id)
   lists[to].value.push(task)
 }
 
-// Lógica de detalle (HU4)
+// --- Lógica de detalle (HU4) ---
 const openDetail = (task) => {
-  selectedTask.value = { ...task }
+  selectedTask.value = { ...task, tags: [...task.tags] }
 }
 
 const saveTask = () => {
   if (!selectedTask.value) return
-  
   const updateList = (list) => {
     const index = list.value.findIndex(t => t.id === selectedTask.value.id)
-    if (index !== -1) {
-      list.value[index] = { ...selectedTask.value }
-      return true
-    }
+    if (index !== -1) { list.value[index] = { ...selectedTask.value }; return true }
     return false
   }
-
   const updated = updateList(pendingTasks) || updateList(inProgressTasks) || updateList(doneTasks)
-  if (updated) {
-    selectedTask.value = null
-  }
+  if (updated) selectedTask.value = null
 }
 
+// --- Lógica de etiquetas en detalle (HU8) ---
+const toggleTag = (tag) => {
+  if (!selectedTask.value) return
+  const idx = selectedTask.value.tags.indexOf(tag)
+  if (idx === -1) selectedTask.value.tags.push(tag)
+  else selectedTask.value.tags.splice(idx, 1)
+}
+
+// --- Lógica de borrado (HU7) ---
 const deleteTask = (task) => {
   if (confirm(`¿Estás seguro de que deseas eliminar la tarea "${task.title}"?`)) {
-    pendingTasks.value = pendingTasks.value.filter(t => t.id !== task.id)
+    pendingTasks.value    = pendingTasks.value.filter(t => t.id !== task.id)
     inProgressTasks.value = inProgressTasks.value.filter(t => t.id !== task.id)
-    doneTasks.value = doneTasks.value.filter(t => t.id !== task.id)
+    doneTasks.value       = doneTasks.value.filter(t => t.id !== task.id)
     selectedTask.value = null
   }
 }
@@ -186,13 +238,18 @@ header p {
   margin-bottom: 2rem;
 }
 
-.search-section {
+/* ── Controls (búsqueda + filtros) ── */
+.controls-section {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
   margin-bottom: 2rem;
+  flex-wrap: wrap;
 }
 
 .search-bar {
-  max-width: 400px;
   padding: 0.5rem 1rem;
+  min-width: 260px;
 }
 
 .search-bar input {
@@ -203,6 +260,21 @@ header p {
   padding: 0.5rem 0;
 }
 
+.tag-filters {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.filter-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ── Kanban ── */
 .kanban {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -242,8 +314,15 @@ header p {
 }
 
 .task-card h4 {
-  margin-bottom: 0.8rem;
+  margin-bottom: 0.6rem;
   font-weight: 500;
+}
+
+.tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.7rem;
 }
 
 .meta {
@@ -268,15 +347,13 @@ header p {
   padding: 0 0.2rem;
 }
 
-.actions button:hover {
-  color: var(--accent-blue);
-}
+.actions button:hover { color: var(--accent-blue); }
 
-.alta { color: #ff3e3e; border-color: #ff3e3e; }
+.alta  { color: #ff3e3e; border-color: #ff3e3e; }
 .media { color: #f39c12; border-color: #f39c12; }
-.baja { color: #2ecc71; border-color: #2ecc71; }
+.baja  { color: #2ecc71; border-color: #2ecc71; }
 
-/* Panel de Detalle */
+/* ── Panel de Detalle ── */
 .task-detail-sidebar {
   position: fixed;
   right: 0;
@@ -287,13 +364,14 @@ header p {
   padding: 2.5rem;
   border-radius: 0;
   border-left: 1px solid var(--card-border);
+  overflow-y: auto;
 }
 
 .detail-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 3rem;
+  margin-bottom: 2.5rem;
 }
 
 .close-btn {
@@ -312,10 +390,12 @@ header p {
   font-size: 0.8rem;
   color: var(--text-secondary);
   margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.form-group input, 
-.form-group select, 
+.form-group input,
+.form-group select,
 .form-group textarea {
   width: 100%;
   background: rgba(0,0,0,0.2);
@@ -325,8 +405,19 @@ header p {
   padding: 0.8rem;
 }
 
+/* Selector de etiquetas (HU8) */
+.tag-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(0,0,0,0.15);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+}
+
 .detail-footer {
-  margin-top: 3rem;
+  margin-top: 2.5rem;
 }
 
 .save-btn {
@@ -345,10 +436,7 @@ header p {
   margin-right: 0.5rem;
 }
 
-.delete-btn:hover {
-  opacity: 1;
-  color: #ff3e3e !important;
-}
+.delete-btn:hover { opacity: 1; color: #ff3e3e !important; }
 
 .delete-link {
   display: block;
@@ -364,10 +452,6 @@ header p {
 }
 
 /* Transición */
-.slide-enter-active, .slide-leave-active {
-  transition: transform 0.3s ease;
-}
-.slide-enter-from, .slide-leave-to {
-  transform: translateX(100%);
-}
+.slide-enter-active, .slide-leave-active { transition: transform 0.3s ease; }
+.slide-enter-from, .slide-leave-to        { transform: translateX(100%); }
 </style>

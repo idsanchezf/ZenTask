@@ -38,3 +38,13 @@
 - [x] Implementar botón de borrado en tarjetas
 - [x] Implementar función de borrado en modal de detalle
 - [x] Validar borrado con pruebas BDD
+
+## Fase 7: Etiquetas y Filtrado (HU8)
+- [x] Definir y planificar HU8: Asignación de Etiquetas
+- [x] Generar prototipo en Stitch
+- [x] Crear `cypress/e2e/features/hu8-etiquetas.feature`
+- [x] Crear step definitions HU8 en `steps.js`
+- [x] Crear componente `src/components/TagChip.vue`
+- [x] Implementar etiquetas en tarjetas del Kanban
+- [x] Implementar filtros de etiqueta sobre el tablero
+- [x] Implementar selector toggle de etiquetas en panel de detalle
