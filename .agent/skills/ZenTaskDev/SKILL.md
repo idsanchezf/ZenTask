@@ -21,11 +21,22 @@ Al iniciar o modificar una HU, se debe actualizar obligatoriamente en `docs/impl
 
 ## 3. Fase de Calidad (BDD de Cypress)
 Antes de escribir código Vue, se debe crear la prueba funcional:
-- **Ubicación**: `cypress/e2e/features/[nombre].feature`.
+- **Ubicación del Feature**: `cypress/e2e/features/[nombre-hu].feature`.
 - **Formato Gherkin Híbrido**:
   - Keywords (EN): `Feature`, `Scenario`, `Given`, `When`, `Then`, `And`.
   - Contenido (ES): Descripción de la acción y el resultado.
-- **Implementación**: Crear los pasos en `cypress/e2e/step_definitions/steps.js` (o archivo específico).
+- **Organización de Step Definitions** (regla obligatoria):
+  - Cada HU tiene **su propio archivo** en `cypress/e2e/step_definitions/steps_[nombre-hu].js`.
+  - Nunca usar un archivo monolítico `steps.js`. Cypress carga todos los `.js` de la carpeta automáticamente.
+  - Convención de nombres: `steps_navegacion.js`, `steps_tablero.js`, `steps_entrada_rapida.js`, `steps_detalle.js`, `steps_estados.js`, `steps_buscador.js`, `steps_borrado.js`, `steps_etiquetas.js`, etc.
+  - Los pasos compartidos entre HUs (ej. `guarda los cambios`) se definen en el archivo de la HU que los origina.
+  - Si un paso del `.feature` usa palabras semánticas adicionales (ej. **"de nuevo"**, **"también"**), se debe añadir un **alias** con el mismo texto exacto apuntando a la misma implementación. Ejemplo:
+    ```js
+    // Paso original
+    When('hace clic en el filtro de etiqueta {string}', (tag) => { ... })
+    // Alias semántico – mismo cuerpo, texto distinto
+    When('hace clic de nuevo en el filtro de etiqueta {string}', (tag) => { ... })
+    ```
 
 ## 4. Fase de Implementación (Vue 3)
 - **Componentes**: Deben ser atómicos y reutilizables.
