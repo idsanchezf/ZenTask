@@ -101,6 +101,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useTasks } from '../composables/useTasks'
 
 // ── Constantes ─────────────────────────────────────────────────────────────
 const WEEKDAYS  = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
@@ -111,20 +112,8 @@ const PRIORITIES = [
   { label: 'Baja',  value: 'baja'  },
 ]
 
-// ── Datos de tareas con dueDate ─────────────────────────────────────────────
-// Usamos el año/mes actuales para que las tareas sean siempre visibles
-const now = new Date()
-const yr  = now.getFullYear()
-const mo  = String(now.getMonth() + 1).padStart(2, '0')
-
-const allTasks = ref([
-  { id: 1, title: 'Diseñar arquitectura base',   priority: 'Alta',  tags: ['Diseño', 'Dev'], dueDate: `${yr}-${mo}-05` },
-  { id: 2, title: 'Configurar entorno BDD',       priority: 'Media', tags: ['Dev', 'QA'],     dueDate: `${yr}-${mo}-05` },
-  { id: 3, title: 'Implementar HU2 Kanban',       priority: 'Alta',  tags: ['Dev'],           dueDate: `${yr}-${mo}-12` },
-  { id: 4, title: 'Definir historias de usuario', priority: 'Baja',  tags: ['Docs'],          dueDate: `${yr}-${mo}-18` },
-  { id: 5, title: 'Revisar pull requests',        priority: 'Media', tags: ['Dev', 'QA'],     dueDate: `${yr}-${mo}-${String(now.getDate()).padStart(2,'0')}` },
-  { id: 6, title: 'Actualizar documentación',     priority: 'Baja',  tags: ['Docs'],          dueDate: `${yr}-${mo}-22` },
-])
+// ── Datos de tareas desde composable compartido ─────────────────────────────
+const { tasks: allTasks } = useTasks()
 
 // ── Estado reactivo ─────────────────────────────────────────────────────────
 const currentDate    = ref(new Date(now.getFullYear(), now.getMonth(), 1))

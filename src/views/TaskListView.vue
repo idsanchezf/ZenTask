@@ -139,38 +139,26 @@
 <script setup>
 import { ref, computed } from 'vue'
 import TagChip from '../components/TagChip.vue'
+import { useTasks } from '../composables/useTasks'
 
 // --- Constantes ---
 const AVAILABLE_TAGS = ['Diseño', 'Dev', 'QA', 'Docs']
 
 // --- Estado reactivo ---
-const searchQuery = ref('')
-const selectedTask = ref(null)
+const searchQuery    = ref('')
+const selectedTask   = ref(null)
 const activeTagFilter = ref(null)
 
-const pendingTasks = ref([
-  { id: 1, title: 'Diseñar arquitectura base',   priority: 'Alta',  tags: ['Diseño', 'Dev'],  description: 'Definir la estructura de carpetas y el patrón de diseño.' },
-  { id: 2, title: 'Configurar entorno BDD',       priority: 'Media', tags: ['Dev', 'QA'],      description: 'Instalar Cypress y Cucumber preprocessor.' },
-])
-
-const inProgressTasks = ref([
-  { id: 3, title: 'Implementar HU2 Kanban',       priority: 'Alta',  tags: ['Dev'],            description: 'Crear la vista de tablero con sus columnas.' },
-])
-
-const doneTasks = ref([
-  { id: 4, title: 'Definir historias de usuario', priority: 'Baja',  tags: ['Docs'],           description: 'Documentar las HUs iniciales en el plan.' },
-])
+// --- Composable compartido ---
+const { pendingTasks, inProgressTasks, doneTasks, deleteTask: removeTask, moveTask: changeStatus, updateTask } = useTasks()
 
 // --- Lógica de filtrado (HU6 + HU8) ---
-const filterTasks = (tasks) => {
-  return tasks.filter(t => {
-    const matchesText = !searchQuery.value
-      || t.title.toLowerCase().includes(searchQuery.value.toLowerCase())
-    const matchesTag = !activeTagFilter.value
-      || t.tags.includes(activeTagFilter.value)
+const filterTasks = (tasks) =>
+  tasks.filter(t => {
+    const matchesText = !searchQuery.value || t.title.toLowerCase().includes(searchQuery.value.toLowerCase())
+    const matchesTag  = !activeTagFilter.value || t.tags.includes(activeTagFilter.value)
     return matchesText && matchesTag
   })
-}
 
 const filteredPending    = computed(() => filterTasks(pendingTasks.value))
 const filteredInProgress = computed(() => filterTasks(inProgressTasks.value))
@@ -183,9 +171,8 @@ const toggleTagFilter = (tag) => {
 
 // --- Lógica de movimiento (HU5) ---
 const moveTask = (task, from, to) => {
-  const lists = { pending: pendingTasks, inProgress: inProgressTasks, done: doneTasks }
-  lists[from].value = lists[from].value.filter(t => t.id !== task.id)
-  lists[to].value.push(task)
+  const statusMap = { pending: 'pending', inProgress: 'inProgress', done: 'done' }
+  changeStatus(task.id, statusMap[to])
 }
 
 // --- Lógica de detalle (HU4) ---
@@ -195,13 +182,8 @@ const openDetail = (task) => {
 
 const saveTask = () => {
   if (!selectedTask.value) return
-  const updateList = (list) => {
-    const index = list.value.findIndex(t => t.id === selectedTask.value.id)
-    if (index !== -1) { list.value[index] = { ...selectedTask.value }; return true }
-    return false
-  }
-  const updated = updateList(pendingTasks) || updateList(inProgressTasks) || updateList(doneTasks)
-  if (updated) selectedTask.value = null
+  updateTask(selectedTask.value)
+  selectedTask.value = null
 }
 
 // --- Lógica de etiquetas en detalle (HU8) ---
@@ -215,9 +197,7 @@ const toggleTag = (tag) => {
 // --- Lógica de borrado (HU7) ---
 const deleteTask = (task) => {
   if (confirm(`¿Estás seguro de que deseas eliminar la tarea "${task.title}"?`)) {
-    pendingTasks.value    = pendingTasks.value.filter(t => t.id !== task.id)
-    inProgressTasks.value = inProgressTasks.value.filter(t => t.id !== task.id)
-    doneTasks.value       = doneTasks.value.filter(t => t.id !== task.id)
+    removeTask(task.id)
     selectedTask.value = null
   }
 }
