@@ -28,12 +28,12 @@ Then('debería ver el gráfico de barras {string}', (title) => {
 })
 
 Then('debería ver el donut chart de distribución por prioridad', () => {
-    cy.get('.donut-section').should('be.visible')
+    cy.get('.donut-section').scrollIntoView().should('be.visible')
     cy.get('.donut-chart').should('be.visible')
-    cy.get('.donut-legend').should('be.visible')
+    cy.get('.donut-legend').scrollIntoView().should('be.visible')
 })
 
 Then('debería ver la sección de próximas fechas de vencimiento', () => {
-    cy.get('.upcoming-section').should('be.visible')
+    cy.get('.upcoming-section').scrollIntoView().should('be.visible')
     cy.get('.upcoming-item').should('have.length.at.least', 1)
 })
