@@ -42,9 +42,23 @@
 ## Fase 7: Etiquetas y Filtrado (HU8)
 - [x] Definir y planificar HU8: Asignación de Etiquetas
 - [x] Generar prototipo en Stitch
-- [x] Crear `cypress/e2e/features/hu8-etiquetas.feature`
-- [x] Crear step definitions HU8 en `steps.js`
+- [x] Crear `cypress/e2e/features/hu8_etiquetas.feature`
+- [x] Crear step definitions HU8 en `steps_etiquetas.js`
 - [x] Crear componente `src/components/TagChip.vue`
 - [x] Implementar etiquetas en tarjetas del Kanban
 - [x] Implementar filtros de etiqueta sobre el tablero
 - [x] Implementar selector toggle de etiquetas en panel de detalle
+
+## Fase 8: Calendario de Tareas (HU9)
+- [x] Definir y planificar HU9: Calendario de Tareas
+- [x] Generar prototipo en Stitch
+- [x] Crear `cypress/e2e/features/hu9_calendario.feature` (5 escenarios)
+- [x] Crear `cypress/e2e/step_definitions/steps_calendario.js`
+- [x] Crear `src/views/CalendarioView.vue` con grid mensual
+- [x] Añadir campo `dueDate` a objetos de tarea
+- [x] Navegación entre meses (anterior / siguiente)
+- [x] Resaltar día actual con acento azul-violeta
+- [x] Tarjetas de tarea compactas en días con `dueDate`
+- [x] Panel lateral de tareas del día seleccionado
+- [x] Filtros de prioridad encima del calendario
+- [x] Actualizar router (`/calendario`) y sidebar en `App.vue`

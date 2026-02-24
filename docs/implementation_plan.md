@@ -48,6 +48,17 @@ Este documento detalla el plan para implementar los primeros módulos de la apli
 - **Criterio 4**: Filtros de etiqueta encima del tablero; al activar uno, solo se muestran tareas con esa etiqueta.
 - **Criterio 5**: El filtro de etiqueta y el buscador de texto funcionan simultáneamente.
 
+### HU9: Calendario de Tareas
+**Como** usuario, **quiero** ver mis tareas en un calendario mensual, **para** planificar mi trabajo en el tiempo.
+- **Criterio 1**: Sección "Calendario" en la sidebar que navega a `/calendario`.
+- **Criterio 2**: Grid mensual (7 columnas Lun–Dom) con mes y año actuales.
+- **Criterio 3**: Navegación al mes anterior/siguiente con flechas ← →.
+- **Criterio 4**: Día actual resaltado con acento azul-violeta.
+- **Criterio 5**: Tareas con `dueDate` aparecen como tarjetas compactas en su día.
+- **Criterio 6**: Clic en un día abre panel lateral con lista de tareas de ese día.
+- **Criterio 7**: Chips de filtro por prioridad (Alta/Media/Baja) encima del grid.
+
+
 ---
 
 ## Configuración de Entorno (Codespaces)

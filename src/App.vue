@@ -12,6 +12,9 @@
         <router-link to="/tareas" class="nav-item">
           <span>Tareas</span>
         </router-link>
+        <router-link to="/calendario" class="nav-item">
+          <span>Calendario</span>
+        </router-link>
       </nav>
       <div class="user-profile">
         <div class="avatar">U</div>
