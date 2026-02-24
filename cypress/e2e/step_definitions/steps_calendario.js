@@ -8,6 +8,12 @@ Given('que el usuario está en la vista de calendario', () => {
     cy.visit('/calendario')
 })
 
+// Alias semántico para el escenario 1 (navega por nombre de sección)
+Given('que el usuario navega a la vista de {string}', (section) => {
+    const routes = { 'Calendario': '/calendario', 'Tareas': '/tareas', 'Panel de Control': '/' }
+    cy.visit(routes[section] ?? '/')
+})
+
 When('hace clic en el botón de siguiente mes', () => {
     cy.get('.btn-next-month').click()
 })
@@ -22,12 +28,12 @@ When('activa el filtro de prioridad {string}', (priority) => {
 
 Then('debería ver un grid de calendario con el mes y año actuales', () => {
     cy.get('.calendar-grid').should('be.visible')
-    cy.get('.calendar-header h2').should('be.visible')
+    cy.get('.month-nav h2').should('be.visible')
 })
 
 Then('debería ver el mes siguiente en el encabezado', () => {
     // Verificamos que el encabezado cambió (texto distinto al inicial)
-    cy.get('.calendar-header h2').should('be.visible')
+    cy.get('.month-nav h2').should('be.visible')
     cy.get('.calendar-grid').should('be.visible')
 })
 
