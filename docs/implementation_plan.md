@@ -58,6 +58,15 @@ Este documento detalla el plan para implementar los primeros módulos de la apli
 - **Criterio 6**: Clic en un día abre panel lateral con lista de tareas de ese día.
 - **Criterio 7**: Chips de filtro por prioridad (Alta/Media/Baja) encima del grid.
 
+### HU11: Drag & Drop en el Tablero Kanban
+**Como** usuario, **quiero** arrastrar y soltar tarjetas entre columnas del tablero Kanban, **para** cambiar el estado de mis tareas de forma visual y rápida sin abrir el modal de detalle.
+- **Criterio 1**: Todas las tarjetas del tablero son arrastrables (`draggable="true"`).
+- **Criterio 2**: Al arrastrar una tarjeta, muestra efecto visual de elevación (opacidad reducida + rotación sutil).
+- **Criterio 3**: La columna destino se resalta con borde punteado azul-violeta al recibir el hover de una tarjeta.
+- **Criterio 4**: Al soltar la tarjeta en una columna distinta, el estado se actualiza automáticamente.
+- **Criterio 5**: La tarjeta aparece instantáneamente en la nueva columna tras el drop.
+- **Criterio 6**: Si se suelta fuera de una columna válida, la tarjeta regresa a su posición original.
+
 
 ---
 

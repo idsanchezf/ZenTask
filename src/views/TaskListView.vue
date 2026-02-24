@@ -25,10 +25,25 @@
 
     <div class="kanban">
       <!-- Columna Pendiente -->
-      <div class="kanban-column glass">
+      <div
+        class="kanban-column glass"
+        :class="{ 'drop-target': overColumn === 'pending' }"
+        @dragover.prevent="handleDragOver('pending')"
+        @dragleave="handleDragLeave"
+        @drop.prevent="handleDrop('pending')"
+      >
         <h3>Pendiente</h3>
         <div class="card-list">
-          <div v-for="task in filteredPending" :key="task.id" class="task-card glass" @click="openDetail(task)">
+          <div
+            v-for="task in filteredPending"
+            :key="task.id"
+            class="task-card glass"
+            :class="{ 'is-dragging': draggingTaskId === task.id }"
+            draggable="true"
+            @dragstart="handleDragStart(task)"
+            @dragend="handleDragEnd"
+            @click="openDetail(task)"
+          >
             <h4>{{ task.title }}</h4>
             <div class="tags-row" v-if="task.tags.length">
               <TagChip v-for="tag in task.tags" :key="tag" :label="tag" :active="true" />
@@ -45,10 +60,25 @@
       </div>
 
       <!-- Columna En Progreso -->
-      <div class="kanban-column glass">
+      <div
+        class="kanban-column glass"
+        :class="{ 'drop-target': overColumn === 'inProgress' }"
+        @dragover.prevent="handleDragOver('inProgress')"
+        @dragleave="handleDragLeave"
+        @drop.prevent="handleDrop('inProgress')"
+      >
         <h3>En Progreso</h3>
         <div class="card-list">
-          <div v-for="task in filteredInProgress" :key="task.id" class="task-card glass" @click="openDetail(task)">
+          <div
+            v-for="task in filteredInProgress"
+            :key="task.id"
+            class="task-card glass"
+            :class="{ 'is-dragging': draggingTaskId === task.id }"
+            draggable="true"
+            @dragstart="handleDragStart(task)"
+            @dragend="handleDragEnd"
+            @click="openDetail(task)"
+          >
             <h4>{{ task.title }}</h4>
             <div class="tags-row" v-if="task.tags.length">
               <TagChip v-for="tag in task.tags" :key="tag" :label="tag" :active="true" />
@@ -66,10 +96,25 @@
       </div>
 
       <!-- Columna Finalizado -->
-      <div class="kanban-column glass">
+      <div
+        class="kanban-column glass"
+        :class="{ 'drop-target': overColumn === 'done' }"
+        @dragover.prevent="handleDragOver('done')"
+        @dragleave="handleDragLeave"
+        @drop.prevent="handleDrop('done')"
+      >
         <h3>Finalizado</h3>
         <div class="card-list">
-          <div v-for="task in filteredDone" :key="task.id" class="task-card glass" @click="openDetail(task)">
+          <div
+            v-for="task in filteredDone"
+            :key="task.id"
+            class="task-card glass"
+            :class="{ 'is-dragging': draggingTaskId === task.id }"
+            draggable="true"
+            @dragstart="handleDragStart(task)"
+            @dragend="handleDragEnd"
+            @click="openDetail(task)"
+          >
             <h4>{{ task.title }}</h4>
             <div class="tags-row" v-if="task.tags.length">
               <TagChip v-for="tag in task.tags" :key="tag" :label="tag" :active="true" />
@@ -145,9 +190,13 @@ import { useTasks } from '../composables/useTasks'
 const AVAILABLE_TAGS = ['Diseño', 'Dev', 'QA', 'Docs']
 
 // --- Estado reactivo ---
-const searchQuery    = ref('')
-const selectedTask   = ref(null)
+const searchQuery     = ref('')
+const selectedTask    = ref(null)
 const activeTagFilter = ref(null)
+
+// --- Estado HU11: Drag & Drop ---
+const draggingTaskId = ref(null)  // ID de la tarea que se está arrastrando
+const overColumn     = ref(null)  // Columna sobre la que se está haciendo hover
 
 // --- Composable compartido ---
 const { pendingTasks, inProgressTasks, doneTasks, deleteTask: removeTask, moveTask: changeStatus, updateTask } = useTasks()
@@ -200,6 +249,32 @@ const deleteTask = (task) => {
     removeTask(task.id)
     selectedTask.value = null
   }
+}
+
+// --- Lógica de Drag & Drop (HU11) ---
+const handleDragStart = (task) => {
+  draggingTaskId.value = task.id
+}
+
+const handleDragEnd = () => {
+  draggingTaskId.value = null
+  overColumn.value     = null
+}
+
+const handleDragOver = (column) => {
+  overColumn.value = column
+}
+
+const handleDragLeave = () => {
+  // Solo limpiamos si el cursor sale realmente de la columna
+  overColumn.value = null
+}
+
+const handleDrop = (targetColumn) => {
+  if (draggingTaskId.value === null) return
+  changeStatus(draggingTaskId.value, targetColumn)
+  draggingTaskId.value = null
+  overColumn.value     = null
 }
 </script>
 
@@ -434,4 +509,28 @@ header p {
 /* Transición */
 .slide-enter-active, .slide-leave-active { transition: transform 0.3s ease; }
 .slide-enter-from, .slide-leave-to        { transform: translateX(100%); }
+
+/* ── HU11: Drag & Drop ── */
+.task-card[draggable='true'] {
+  cursor: grab;
+}
+
+.task-card[draggable='true']:active {
+  cursor: grabbing;
+}
+
+.task-card.is-dragging {
+  opacity: 0.5;
+  transform: rotate(2deg) scale(1.03);
+  box-shadow: 0 16px 40px rgba(74, 144, 217, 0.4);
+  border: 1px solid var(--accent-blue);
+}
+
+.kanban-column.drop-target {
+  border: 2px dashed transparent;
+  border-image: linear-gradient(135deg, #4a90d9, #7b5ea7) 1;
+  background: rgba(74, 144, 217, 0.06);
+  box-shadow: inset 0 0 20px rgba(74, 144, 217, 0.08);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
 </style>

@@ -38,6 +38,9 @@ Antes de escribir código Vue, se debe crear la prueba funcional:
     | HU6 | `hu6_buscador_filtros.feature` |
     | HU7 | `hu7_borrado_tareas.feature` |
     | HU8 | `hu8_etiquetas.feature` |
+    | HU9 | `hu9_calendario.feature` |
+    | HU10 | `hu10_dashboard_stats.feature` |
+    | HU11 | `hu11_drag_drop.feature` |
 
 - **Formato Gherkin Híbrido**:
   - Keywords (EN): `Feature`, `Scenario`, `Given`, `When`, `Then`, `And`.
