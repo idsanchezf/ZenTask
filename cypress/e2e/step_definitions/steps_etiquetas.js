@@ -13,6 +13,12 @@ When('hace clic en el filtro de etiqueta {string}', (tag) => {
     cy.get('.tag-filters .tag-chip').contains(tag).click()
 })
 
+// Alias semántico para el escenario de desactivar filtro
+When('hace clic de nuevo en el filtro de etiqueta {string}', (tag) => {
+    cy.get('.tag-filters .tag-chip').contains(tag).click()
+})
+
+
 When('activa la etiqueta {string} en el panel de etiquetas', (tag) => {
     cy.get('.tag-selector .tag-chip').contains(tag).click()
 })
