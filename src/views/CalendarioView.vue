@@ -116,6 +116,7 @@ const PRIORITIES = [
 const { tasks: allTasks } = useTasks()
 
 // ── Estado reactivo ─────────────────────────────────────────────────────────
+const now            = new Date()
 const currentDate    = ref(new Date(now.getFullYear(), now.getMonth(), 1))
 const selectedDay    = ref(null)
 const priorityFilter = ref(null)

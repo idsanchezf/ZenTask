@@ -23,7 +23,7 @@ When('hace clic en un día con tareas', () => {
 })
 
 When('activa el filtro de prioridad {string}', (priority) => {
-    cy.get('.priority-filters .badge').contains(priority).click()
+    cy.contains('.priority-filters .badge', priority).click()
 })
 
 Then('debería ver un grid de calendario con el mes y año actuales', () => {
